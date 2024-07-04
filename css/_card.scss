@@ -1,0 +1,36 @@
+.cards {
+    display: flex; /* Размещение слайдов в строку */
+    transition: transform 0.5s ease; /* Плавное изменение положения слайдов */
+    gap: 75px;
+    margin-top: 60px;
+
+    .card {
+        padding: 10px; /* Внутренние отступы для карточек */
+        min-width: 350px;
+        height: 400px;
+        box-sizing: border-box;
+        background-color: #1E1E1E;
+        justify-content: space-between;
+        border-radius: 10px;
+
+        &__title {
+            color: #FDE922;
+            font-size: 18px;
+            text-align: center;
+            /* Выравнивание содержимого по центру */
+            margin-top: 30px;
+        }
+            
+        &__body {
+            margin-left: 35px;
+            font-size: 15px;
+            color: white;
+            margin-top: 50px;
+            display: flex;
+            gap: 10px;
+            flex-direction: column
+        }
+    }
+}
+
+
