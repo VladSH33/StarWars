@@ -1,38 +1,32 @@
 window.addEventListener('DOMContentLoaded', () => {
     
-    class MenuCard {
-        constructor(name, height, mass, hair_color, skin_color, eye_color, birth_year, gender, parentSelector) {
-            this.name = name;
-            this.height = height;
-            this.mass = mass;
-            this.hair_color = hair_color;
-            this.skin_color = skin_color;
-            this.eye_color = eye_color;
-            this.birth_year = birth_year;
-            this.gender = gender;
+
+// Класс страницы
+    class createPage {
+        constructor(card, parentSelector) {
+            this.card = card;
             this.parent = document.querySelector(parentSelector);
         }
 
+        
+
         render() {
+            console.log(this.card)
             const element = document.createElement('div');
             element.classList.add('card');
 
-            element.innerHTML = `
-                    <h3 class="card__title">${this.name}</h3>
-                    <div class="card__body">
-                        <div class="card__height">height: ${this.height}</div>
-                        <div class="card__mass">hair_color: ${this.mass}</div>
-                        <div class="card__hair-color">skin_color: ${this.hair_color}</div>
-                        <div class="card__skin-color">eye_color: ${this.skin_color}</div>
-                        <div class="card__eye-color">birth_year: ${this.eye_color}</div>
-                        <div class="card__birth-year">gender: ${this.birth_year}</div>
-                        <div class="card__gender">homeworld: ${this.gender}</div>
-                    </div>
-            `;
-            this.parent.append(element);
+            for(let key in this.card) {
+                element.innerHTML = `
+                     <div class="${key}">${this.card[key]}</div>
+                `
+            }
+
+            this.parent.append(element)
         }
     }
 
+
+// Получаю данные через fetch
     const getResource = async (url) => {
         const res = await fetch(url);
         
@@ -43,17 +37,22 @@ window.addEventListener('DOMContentLoaded', () => {
         return res.json(); // JSON в обычный формат JS перевожу
     }
 
+    // console.log(getResource('https://swapi.dev/api/people/'))
     // пришлось колхозить с глобальными переменными так как используются в нескольких функциях
     let cardsContainer;
     let cardList;
     let slideWidth;
     let slideIndex = 0;
-
+//Передаю данные в класс
     getResource('https://swapi.dev/api/people/')
         .then(data => {
-            data.results.forEach(({name, height, mass, hair_color, skin_color, eye_color, birth_year, gender}) => {
-                new MenuCard(name, height, mass, hair_color, skin_color, eye_color, birth_year, gender, '.cards').render();
+            data.results.forEach((card) => {
+                // console.log(card)
+                new createPage(card, '.cards').render();
             });
+
+
+// Далее работа со слайдером.
 
             cardsContainer = document.querySelector('.cards');
             cardList = document.querySelectorAll('.card'); // Теперь, когда карточки добавлены, можно получить их коллекцию
@@ -87,13 +86,3 @@ window.addEventListener('DOMContentLoaded', () => {
 
     window.moveSlide = moveSlide; // Делаем функцию доступной глобально
 });
-
-class createPage {
-    constructor() {
-        
-    }
-
-    render() {
-        
-    }
-}
