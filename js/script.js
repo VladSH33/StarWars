@@ -2,26 +2,51 @@ window.addEventListener('DOMContentLoaded', () => {
     
 
 // Класс страницы
-    class createPage {
+
+    // class Page {
+    //     constructor(){
+
+    //     }
+    // }
+
+// Класс карточки
+    class Card {
         constructor(card, parentSelector) {
             this.card = card;
             this.parent = document.querySelector(parentSelector);
         }
-
-        
-
+//создание карточки
         render() {
-            console.log(this.card)
-            const element = document.createElement('div');
-            element.classList.add('card');
+            // создаю элементы
+            const cardContainer = document.createElement('div');
+            const specificationsCard = document.createElement('div');
+            const titleCard = document.createElement('div');
+            //Присваиваю классы
+            cardContainer.classList.add('card');
+            specificationsCard.classList.add('card__specifications');
+            titleCard.classList.add('card__title')
+                //Преобразую массив с обьектами в Массив с подмассивами, и получаю подмассив с name
+                const specifications = Object.entries(this.card)
+                const specificationsTitle = specifications.find(title => title[0] == 'name')
+                const getTitle = specificationsTitle ? specificationsTitle[1] : undefined;
+                //обрезаю лишине данные
+                const specificationsSlice = specifications.slice(1, 8);
 
-            for(let key in this.card) {
-                element.innerHTML = `
-                     <div class="${key}">${this.card[key]}</div>
-                `
-            }
-
-            this.parent.append(element)
+                specificationsSlice.forEach(([key, value]) => {
+                    //заменяю _ в названии характеристик на пробел
+                    const specificationName = key.replace('_',' ');
+                    //формирую элементы с классами, названием характеристики и значением
+                    specificationsCard.innerHTML += 
+                    `
+                        <div class="${key}">${specificationName}: ${value}</div>
+                    `
+                })
+            
+            //Передаю переменные в элементы на странице
+            titleCard.append(getTitle)
+            cardContainer.append(titleCard)
+            cardContainer.append(specificationsCard)
+            this.parent.append(cardContainer)
         }
     }
 
@@ -37,20 +62,21 @@ window.addEventListener('DOMContentLoaded', () => {
         return res.json(); // JSON в обычный формат JS перевожу
     }
 
-    // console.log(getResource('https://swapi.dev/api/people/'))
-    // пришлось колхозить с глобальными переменными так как используются в нескольких функциях
+// пришлось колхозить с глобальными переменными так как используются в нескольких функциях
     let cardsContainer;
     let cardList;
     let slideWidth;
     let slideIndex = 0;
+
 //Передаю данные в класс
     getResource('https://swapi.dev/api/people/')
+    // getResource('https://swapi.dev/api/planets/')
         .then(data => {
-            data.results.forEach((card) => {
-                // console.log(card)
-                new createPage(card, '.cards').render();
+            this.cards = data.results.map((card) => {
+                const instance = new Card(card, '.cards');
+                instance.render();
+                return instance;
             });
-
 
 // Далее работа со слайдером.
 
@@ -75,12 +101,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function moveSlide(direction) {
-        slideIndex += direction; // +1 или -1 получаю при клике на кнопку
-        if (slideIndex < 0) {
-            slideIndex = cardList.length - 3; // Последние 3 слайда
-        } else if (slideIndex > cardList.length - 3) {
-            slideIndex = 0; // Первые 3 слайда
-        }
+        const numSlides = cardList.length - 3; 
+        slideIndex = (slideIndex + direction + numSlides) % numSlides;
         updateSlider();
     }
 
