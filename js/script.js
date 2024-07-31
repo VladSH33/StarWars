@@ -148,11 +148,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 responseJson[key] = await getResource(value, false)
 
             } else if (Array.isArray(value) && value.every(item => typeof item === 'string' && isSwapiUrl(item))){
-                value.forEach(async urlItem => {
-                    
-                    responseJson[key] = await getResource(urlItem, false)
 
-                })
+                array = value.map(item => getResource(item, false))
+                responseJson[key] = await Promise.all(array);
+
             }
         }
 
@@ -166,8 +165,8 @@ getResource('https://swapi.dev/api/people/1', true)
 setTimeout(() => {
 
     // const obj = cache.has('https://swapi.dev/api/people/1')
-    // const obj = cache.get('https://swapi.dev/api/people/1')
-    // console.log(Object.entries(obj))
+    const obj = cache.get('https://swapi.dev/api/people/1')
+    console.log(Object.entries(obj))
 
 }, 1000);
 
