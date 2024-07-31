@@ -108,72 +108,68 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const cache = new Map();
 
-    async function getResource(url) {
+    async function getResource(url, deep) {
+        let needToGoToDeep = deep;
+        let responseJson = {};
+
         if (cache.has(url)) {
             return cache.get(url)
-        } 
-
-        async function fetchData(url) {
-            try {
-                // Ожидаем завершения запроса fetch
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Какая-то херня с фетчом ${url}, status: ${res.status}`);
-                }
-                // Ожидаем получения данных в формате JSON
-                const responseJson = await response.json();
-                return responseJson?.results ?? responseJson;
-                // return responseJson.results
-            } catch (error) {
-                console.error('Fetch error:', error);
-            }
         }
-        
-        // Используем асинхронную функцию
-        const JSON = await fetchData(url)
-        // console.log(JSON)
+
+        try {
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`Какая-то херня с фетчом ${url}, status: ${response.status}`);
+            }
+
+            responseJson = await response.json();
+            // console.log(responseJson)
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+
+        if (deep === false) {
+            return responseJson;
+        }
         
         function isSwapiUrl(value) {
             const prefix = 'https://swapi.dev/api/';
             return value.startsWith(prefix);
         }
-        
-        async function filterObjectWithSwapiUrls(obj) {
-            for (const key in obj) {
-                const value = obj[key];
 
-                if (typeof value === 'string' && isSwapiUrl(value)) {
-                    obj[key] = await fetchData(value)
-                    console.log(obj[key])
-                } else if (Array.isArray(value) && value.every(item => typeof item === 'string' && isSwapiUrl(item))){
-                    console.log(obj[key])
+        for (const key in responseJson) {
 
-                    value.forEach(async (urlItem) => {
-                        obj[key] = await fetchData(urlItem)
-                        // console.log(obj[key])
-                    })
-                }
+            const value = responseJson[key];
+
+            if (typeof value === 'string' && isSwapiUrl(value)) {
+
+                responseJson[key] = await getResource(value, false)
+
+            } else if (Array.isArray(value) && value.every(item => typeof item === 'string' && isSwapiUrl(item))){
+                value.forEach(async urlItem => {
+                    
+                    responseJson[key] = await getResource(urlItem, false)
+
+                })
             }
-        
-            return obj;
         }
-        
-        const filteredObject = await filterObjectWithSwapiUrls(JSON);
-        // console.log(filteredObject);
 
-
-        return cache.set(url, JSON)
-
-
+        return cache.set(url, responseJson)
     };
 
-getResource('https://swapi.dev/api/people/1')
+getResource('https://swapi.dev/api/people/1', true)
+// console.log(cache.get('https://swapi.dev/api/people/1'))
 
 
-// setTimeout(() => {
-//     console.log(cache.has('https://swapi.dev/api/people/1'))
-//     console.log(cache.get('https://swapi.dev/api/people/1'))
-// }, 1000);
+setTimeout(() => {
+
+    // const obj = cache.has('https://swapi.dev/api/people/1')
+    // const obj = cache.get('https://swapi.dev/api/people/1')
+    // console.log(Object.entries(obj))
+
+}, 1000);
 
 // пришлось колхозить с глобальными переменными так как используются в нескольких функциях
 let cardsContainer;
@@ -183,6 +179,13 @@ let slideIndex = 0;
 
 
 
+// const obj = {
+//     name: 'vlad',
+//     surnname: 'shevkunov',
+//     old: 22,
+// }
+
+// console.log(Object.entries(obj))
 
 
 
