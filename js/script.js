@@ -1,115 +1,12 @@
 window.addEventListener('DOMContentLoaded', () => {
-    
 
-// Класс страницы
+const config = {
+    people: ['https://swapi.dev/api/people/1', 'https://swapi.dev/api/people/2', 'https://swapi.dev/api/people/3', 'https://swapi.dev/api/people/4', 'https://swapi.dev/api/people/5', 'https://swapi.dev/api/people/6', 'https://swapi.dev/api/people/7', 'https://swapi.dev/api/people/8', 'https://swapi.dev/api/people/9', 'https://swapi.dev/api/people/10']
+}
+const cache = new Map();
 
-    class Page {
+async function getResource(url, deep = true) {
 
-        constructor (API, bodyContainer) {
-            this.API = API;
-            this.bodyContainer = bodyContainer;
-        }
-
-        static Card = class  {
-
-            constructor (card, parentSelector) {
-                this.card = card;
-                this.parent = document.querySelector(parentSelector);
-            }
-
-            //создание карточки
-
-            removeCards() {
-                console.log(this.card)
-            }
-
-            render() {
-
-                // создаю элементы
-
-                const cardContainer = document.createElement('div');
-                const specificationsCard = document.createElement('div');
-                const titleCard = document.createElement('div');
-                const homeworldBtn = document.createElement('button');
-
-                //Присваиваю классы
-
-                cardContainer.classList.add('card');
-                specificationsCard.classList.add('card__specifications');
-                titleCard.classList.add('card__title');
-                homeworldBtn.classList.add('homeworld');
-
-                homeworldBtn.textContent = 'homeworld';
-
-                //Преобразую массив с обьектами в Массив с подмассивами, и получаю подмассив с name
-
-                const specifications = Object.entries(this.card)
-                const specificationsTitle = specifications.find(title => title[0] == 'name')
-                const foundTitle = specificationsTitle ? specificationsTitle[1] : undefined;
-
-                //обрезаю лишине данные
-
-                const specificationsSlice = specifications.slice(1, 8);
-
-                specificationsSlice.forEach(([key, value]) => {
-                    //заменяю _ в названии характеристик на пробел
-                    const specificationName = key.replace('_',' ');
-                    //формирую элементы с классами, названием характеристики и значением
-                    specificationsCard.innerHTML += 
-                    `
-                        <div class="${key}">${specificationName}: ${value}</div>
-                    `
-                })
-
-                //Передаю переменные в элементы на странице
-
-                specificationsCard.append(homeworldBtn)
-                titleCard.append(foundTitle)
-                cardContainer.append(titleCard)
-                cardContainer.append(specificationsCard)
-                this.parent.append(cardContainer)
-
-
-                // homeworldBtn.addEventListener('click', () => {
-                //     removeCards()
-                //     getResource('https://swapi.dev/api/planets/')
-                // })
-
-            }
-        }
-    }
-
-
-// Получаю данные через fetch
-    // const getResource = async (url) => {
-    //     const res = await fetch(url);
-        
-    //     if (!res.ok) {
-    //         throw new Error(`Какая-то херня с фетчом ${url}, status: ${res.status}`); // получаем ошибку
-    //     }
-
-    //     return res.json(); // JSON в обычный формат JS перевожу
-    // }
-
-    // console.log(getResource('https://swapi.dev/api/people/'))
-
-//Передаю данные в класс
-
-    // getResource('https://swapi.dev/api/people/')
-    // // getResource('https://swapi.dev/api/planets/')
-    //     .then(data => {
-    //         this.cards = data.results.map((card) => {
-
-    //             const instanceCards = new Page.Card(card, '.cards');
-    //             instanceCards.render();
-    //             return instanceCards;
-    //         });
-    //     });
-
-    const cache = new Map();
-
-    async function getResource(url, deep) {
-        let needToGoToDeep = deep;
         let responseJson = {};
 
         if (cache.has(url)) {
@@ -124,103 +21,190 @@ window.addEventListener('DOMContentLoaded', () => {
             }
 
             responseJson = await response.json();
-            // console.log(responseJson)
 
         } catch (error) {
             console.error('Fetch error:', error);
         }
 
         if (deep === false) {
-            return responseJson;
+            // console.log(responseJson.name || responseJson.title)
+            // return responseJson.name || responseJson.title;
+            return responseJson
         }
         
-        function isSwapiUrl(value) {
-            const prefix = 'https://swapi.dev/api/';
-            return value.startsWith(prefix);
-        }
+        const isSwapiUrl = value => value.startsWith('https://swapi.dev/api/')
 
         for (const key in responseJson) {
-
             const value = responseJson[key];
-
             if (typeof value === 'string' && isSwapiUrl(value)) {
-
                 responseJson[key] = await getResource(value, false)
-
             } else if (Array.isArray(value) && value.every(item => typeof item === 'string' && isSwapiUrl(item))){
-
                 array = value.map(item => getResource(item, false))
                 responseJson[key] = await Promise.all(array);
-
             }
         }
+        cache.set(url, responseJson)
+        return responseJson
+};
 
-        return cache.set(url, responseJson)
-    };
+class Page {
+    constructor (activeTab, config) {
+        this.activeTab = activeTab;
+        this.config = config;
+        this.cards = [];
+        this.cardsContainer = document.querySelector('.cards');
+        this.createCards();
+    }
 
-getResource('https://swapi.dev/api/people/1', true)
-// console.log(cache.get('https://swapi.dev/api/people/1'))
+    createCards() {
+        this.config[this.activeTab].forEach(async (url) => {
+            const data = await getResource(url);
+            const card = new Card(data, this.cardsContainer);
+            this.cards.push(card);
+        })
+    }
+
+    removeCards() {
+        this.cards.forEach(card => {
+            card.removeCard()
+        });
+    }
+}   
+
+class Card {
+    constructor (card, parentElement) {
+        this.card = card;
+        this.parent = parentElement;
+        this.containerCard = null;
+        this.render();
+    }
 
 
-setTimeout(() => {
 
-    // const obj = cache.has('https://swapi.dev/api/people/1')
-    const obj = cache.get('https://swapi.dev/api/people/1')
-    console.log(Object.entries(obj))
+    render() {
+        this.containerCard = document.createElement('div');
+        const titleCard = document.createElement('div');
+        const specificationsCard = document.createElement('div');
+        const elementArrContainerCard = document.createElement('div');
 
-}, 1000);
+        this.containerCard.classList.add('card');
+        titleCard.classList.add('card__title');
+        specificationsCard.classList.add('card__specifications');
+        elementArrContainerCard.classList.add('elementArr__container');
+
+        const title = this.card['name'];
+
+        delete this.card['name'];
+        delete this.card['url'];
+        delete this.card['created'];
+        delete this.card['edited'];
+
+        const specifications = Object.entries(this.card)
+        // console.log(specifications)
+        specifications.forEach(([key, value]) => {
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                elementArrContainerCard.innerHTML += `<button class="elemetArr__title">${value.name}</button>`
+
+                // const elements = document.querySelectorAll('.elemetArr__title')
+                // // console.log(elements)
+                // elements.forEach(element => {
+                //     element.addEventListener('click', () => {
+                //         console.log('hi')
+                //     })
+                // })
+
+                // elementArrContainerCard.addEventListener('click', (event) => {
+                //     if(event.target.classList.contains('elemetArr__title')) {
+                //         console.log(value.url)
+                //     }
+                // })
+        
+
+            } else if (Array.isArray(value) && value.length !== 0) {
+                
+                value.forEach(element => {
+                    // console.log(element)
+                    elementArrContainerCard.innerHTML += `<button class="elemetArr__title">${element.title || element.name}</button>`
+                    elementArrContainerCard.addEventListener('click', (event) => {
+                        if(event.target.classList.contains('elemetArr__title')) {
+                            const objectPeople = {
+                                people: element.characters,
+                            };
+                            console.log(element.title)
+                            new Page('people', objectPeople).removeCards()
+                            event.stopPropagation();
+                        }
+                    })
+
+                })
+            } else if (typeof(value) === 'string'){
+                specificationsCard.innerHTML += `<div class="${key}">${key}: ${value}</div>`
+            }
+        })
+
+        const tagsButton = document.createElement('div');
+        tagsButton.classList.add('card__tags');
+        tagsButton.textContent = 'open tags'
+
+        tagsButton.addEventListener('click', () => {
+            elementArrContainerCard.classList.toggle('open');
+        })
+
+        specificationsCard.append(elementArrContainerCard)
+        titleCard.append(title)
+        this.containerCard.append(titleCard)
+        this.containerCard.append(specificationsCard)
+        this.containerCard.append(tagsButton)
+        this.parent.append(this.containerCard);
+    }
+
+    removeCard() {
+        if (this.containerCard) {
+            this.containerCard.remove()
+        }
+    }
+
+}
+
+new Page('people', config)
+
 
 // пришлось колхозить с глобальными переменными так как используются в нескольких функциях
-let cardsContainer;
-let cardList;
-let slideWidth;
-let slideIndex = 0;
-
-
-
-// const obj = {
-//     name: 'vlad',
-//     surnname: 'shevkunov',
-//     old: 22,
-// }
-
-// console.log(Object.entries(obj))
-
-
-
-
-
+// let cardsContainer;
+// let cardList;
+// let slideWidth;
+// let slideIndex = 0;
 
 
 // Далее работа со слайдером
 
-//             cardsContainer = document.querySelector('.cards');
-//             cardList = document.querySelectorAll('.card'); // Теперь, когда карточки добавлены, можно получить их коллекцию
+    //         cardsContainer = document.querySelector('.cards');
+    //         cardList = document.querySelectorAll('.card'); // Теперь, когда карточки добавлены, можно получить их коллекцию
 
-//             const stylesCardsContainer = window.getComputedStyle(cardsContainer)
+    //         const stylesCardsContainer = window.getComputedStyle(cardsContainer)
             
-//             const numGap = parseInt(stylesCardsContainer.gap.slice(0, -2))
+    //         const numGap = parseInt(stylesCardsContainer.gap.slice(0, -2))
 
-//             slideWidth = cardList[0].clientWidth + numGap // считаю растояние на которое будет перемещение слайдера
+    //         slideWidth = cardList[0].clientWidth + numGap // считаю растояние на которое будет перемещение слайдера
 
-//             updateSlider(); // Пример вызова функции для обновления слайдера после загрузки данных
-//         // })
-//         // .catch(error => {
-//         //     console.error(error);
-//         // });
+    //         updateSlider(); // Пример вызова функции для обновления слайдера после загрузки данных
+    //     })
+    //     .catch(error => {
+    //         console.error(error);
+    //     });
 
-//     function updateSlider() {
-//         const translateValue = -slideIndex * slideWidth 
-//         cardsContainer.style.transform = `translateX(${translateValue}px)`; // прокрутка слайдера
-//     }
+    // function updateSlider() {
+    //     const translateValue = -slideIndex * slideWidth 
+    //     cardsContainer.style.transform = `translateX(${translateValue}px)`; // прокрутка слайдера
+    // }
 
-//     function moveSlide(direction) {
-//         const numSlides = cardList.length - 3; 
-//         slideIndex = (slideIndex + direction + numSlides) % numSlides;
-//         updateSlider();
-//     }
+    // function moveSlide(direction) {
+    //     const numSlides = cardList.length - 3; 
+    //     slideIndex = (slideIndex + direction + numSlides) % numSlides;
+    //     updateSlider();
+    // }
 
-//     window.moveSlide = moveSlide; // Делаем функцию доступной глобально
+    // window.moveSlide = moveSlide; // Делаем функцию доступной глобально
 
 
 });

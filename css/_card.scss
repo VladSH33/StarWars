@@ -3,15 +3,17 @@
     transition: transform 0.5s ease; /* Плавное изменение положения слайдов */
     gap: 75px;
     margin-top: 60px;
+    min-height: 300px;
 
     .card {
-        padding: 10px; /* Внутренние отступы для карточек */
+        padding: 10px 0px 10px; /* Внутренние отступы для карточек */
         min-width: 350px;
-        height: 400px;
+        min-height: 300px;
         box-sizing: border-box;
         background-color: #1E1E1E;
         justify-content: space-between;
         border-radius: 10px;
+        
 
         &__title {
             color: #FDE922;
@@ -23,21 +25,45 @@
             
         &__specifications {
             margin-left: 35px;
-            font-size: 15px;
+            font-size: 13px;
             color: white;
-            margin-top: 50px;
+            margin-top: 35px;
             display: flex;
             gap: 10px;
-            flex-direction: column
+            flex-direction: column;
 
+            .elementArr__container {
+                display: none;
+            }
+
+            .elementArr__container.open {
+                margin-top: 20px;
+                display: flex;
+                gap: 10px;
+                flex-direction: column;
+                
+
+                .elemetArr__title {
+                    background: none;
+                    color: #f0f0f0;
+                    border: none;
+                    cursor: pointer;
+                }
+            }
         }
-        
-        .homeworld {
-            margin-top: 10px;
-            border: none;
-            padding: 8px 16px;
+
+        .card__tags {
+            width: 140px;
+            height: 40px;
+            border-radius: 10px;
+            text-align: center;
+            padding: 13px 5px;
+            font-size: 13px;
+            margin: 0 auto;
+            margin-top: 20px;
+            color: #f0f0f0;
             cursor: pointer;
-            margin: 0 5px;
+            border: 1px solid #FDE922;
         }
     }
 }
