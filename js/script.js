@@ -52,7 +52,7 @@ class Page {
         this.activeTab = activeTab;
         this.config = config;
         this.cards = [];
-        this.cardsContainer = document.querySelector('.cards');
+        this.cardsContainer = document.querySelector('.swiper-wrapper');
         this.createCards();
     }
 
@@ -87,7 +87,7 @@ class Card {
         const specificationsCard = document.createElement('div');
         const elementArrContainerCard = document.createElement('div');
 
-        this.containerCard.classList.add('card');
+        this.containerCard.classList.add('swiper-slide');
         titleCard.classList.add('card__title');
         specificationsCard.classList.add('card__specifications');
         elementArrContainerCard.classList.add('elementArr__container');
@@ -103,22 +103,7 @@ class Card {
         // console.log(specifications)
         specifications.forEach(([key, value]) => {
             if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-                elementArrContainerCard.innerHTML += `<button class="elemetArr__title">${value.name}</button>`
-
-                // const elements = document.querySelectorAll('.elemetArr__title')
-                // // console.log(elements)
-                // elements.forEach(element => {
-                //     element.addEventListener('click', () => {
-                //         console.log('hi')
-                //     })
-                // })
-
-                // elementArrContainerCard.addEventListener('click', (event) => {
-                //     if(event.target.classList.contains('elemetArr__title')) {
-                //         console.log(value.url)
-                //     }
-                // })
-        
+                elementArrContainerCard.innerHTML += `<button class="elemetArr__title">${value.name}</button>`        
 
             } else if (Array.isArray(value) && value.length !== 0) {
                 
@@ -168,43 +153,15 @@ class Card {
 
 new Page('people', config)
 
-
-// пришлось колхозить с глобальными переменными так как используются в нескольких функциях
-// let cardsContainer;
-// let cardList;
-// let slideWidth;
-// let slideIndex = 0;
-
-
-// Далее работа со слайдером
-
-    //         cardsContainer = document.querySelector('.cards');
-    //         cardList = document.querySelectorAll('.card'); // Теперь, когда карточки добавлены, можно получить их коллекцию
-
-    //         const stylesCardsContainer = window.getComputedStyle(cardsContainer)
-            
-    //         const numGap = parseInt(stylesCardsContainer.gap.slice(0, -2))
-
-    //         slideWidth = cardList[0].clientWidth + numGap // считаю растояние на которое будет перемещение слайдера
-
-    //         updateSlider(); // Пример вызова функции для обновления слайдера после загрузки данных
-    //     })
-    //     .catch(error => {
-    //         console.error(error);
-    //     });
-
-    // function updateSlider() {
-    //     const translateValue = -slideIndex * slideWidth 
-    //     cardsContainer.style.transform = `translateX(${translateValue}px)`; // прокрутка слайдера
-    // }
-
-    // function moveSlide(direction) {
-    //     const numSlides = cardList.length - 3; 
-    //     slideIndex = (slideIndex + direction + numSlides) % numSlides;
-    //     updateSlider();
-    // }
-
-    // window.moveSlide = moveSlide; // Делаем функцию доступной глобально
-
+const swiper = new Swiper('.swiper', {slidesPerView: 3, spaceBetween: 30, 
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+    // pagination: {
+    //     el: '.swiper-pagination',
+    //     clickable: true,
+    // },
+});
 
 });
