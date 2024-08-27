@@ -6,12 +6,22 @@
     height: auto;
     margin: 50px auto;
     position: relative;
+    flex-direction: column;
 
+    .panel-tabs {
+        display: flex;
+        color: white;
+        gap: 50px;
+
+        .tab.open {
+            color: #848282;
+        }
+    }
 
     .swiper {
         width: 80%;
         height: auto;
-        margin-top: 50px;
+        margin-top: 100px;
 
         .swiper-slide {
             min-height: 300px;
@@ -114,7 +124,7 @@
 
 .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction {
     position: absolute;
-    top: -10px;
+    top: 50px;
     z-index: 0;
 }
 

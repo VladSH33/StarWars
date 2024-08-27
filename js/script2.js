@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         planets: ['https://swapi.dev/api/planets/1', 'https://swapi.dev/api/planets/2', 'https://swapi.dev/api/planets/3', 'https://swapi.dev/api/planets/4', 'https://swapi.dev/api/planets/5', 'https://swapi.dev/api/planets/6', 'https://swapi.dev/api/planets/7', 'https://swapi.dev/api/planets/8', 'https://swapi.dev/api/planets/9', 'https://swapi.dev/api/planets/10'],
 
-        starships: ['https://swapi.dev/api/starships/1', 'https://swapi.dev/api/starships/3', 'https://swapi.dev/api/starships/5', 'https://swapi.dev/api/starships/9', 'https://swapi.dev/api/starships/10', 'https://swapi.dev/api/starships/11', 'https://swapi.dev/api/starships/12', 'https://swapi.dev/api/starships/13', 'https://swapi.dev/api/starships/15', 'https://swapi.dev/api/starships/17'],
+        starships: ['https://swapi.dev/api/starships/2', 'https://swapi.dev/api/starships/3', 'https://swapi.dev/api/starships/5', 'https://swapi.dev/api/starships/9', 'https://swapi.dev/api/starships/10', 'https://swapi.dev/api/starships/11', 'https://swapi.dev/api/starships/12', 'https://swapi.dev/api/starships/13', 'https://swapi.dev/api/starships/15', 'https://swapi.dev/api/starships/17'],
         
         films: ['https://swapi.dev/api/films/1', 'https://swapi.dev/api/films/2', 'https://swapi.dev/api/films/3', 'https://swapi.dev/api/films/4', 'https://swapi.dev/api/films/5', 'https://swapi.dev/api/films/6'],
 
@@ -155,7 +155,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const normalizeData = (url, json) => {
         
         const currentType = contentCategories.find(type => url.includes(type));
-        // console.log(url, currentType, usefullFields)
         const { specifications, tagGroups } = usefullFields[currentType];
         
         const resultJson = {
@@ -178,8 +177,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     value: [json[tagField]] // obj in array
                 });
             } else if (tagField !== 'homeworld') {
-                // console.log(json[tagField])
-                // console.log(tagField)
                 resultJson.tagGroups.push({
                     name: tagField,
                     value: json[tagField] // Array
@@ -212,8 +209,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
         if (deep === false) {
-            // console.log(responseJson.name || responseJson.title)
-            // return responseJson.name || responseJson.title;
             responseJson = normalizeData(url, responseJson);
             return responseJson
         }
@@ -246,14 +241,17 @@ window.addEventListener('DOMContentLoaded', () => {
             this.cardsContainer = document.querySelector('.swiper-wrapper');
 
             this.createCards(this.config[this.activeTab]);
+            this.renderTabs();
         }
 
         async createCards(urls) {
+            // console.log(urls)
+            this.datasets = [];
             for (const url of urls) {
                 const dataset = await getResource(url);
                 this.datasets.push(dataset)
             }
-
+            // console.log(this.datasets)
             this.datasets.forEach((dataset) => {
                 this.cards.push(
                     new Card(dataset, this.cardsContainer, {
@@ -264,23 +262,38 @@ window.addEventListener('DOMContentLoaded', () => {
                                 this.createCards(tagData.value);
                             }
                         }
-                    })    
+                    })
                 )
             })
         }
 
         renderTabs() {
-            // ...
-        }
+            const tabsPanel = document.createElement('div');
+            tabsPanel.classList.add('panel-tabs');
 
+            contentCategories.forEach(tab => {
+                const elTab = document.createElement('div');
+                elTab.classList.add('tab');
+                elTab.innerHTML = tab;
+                tabsPanel.append(elTab);
+
+                elTab.addEventListener('click', () => {
+                    this.setTab(tab);
+                    elTab.classList.toggle('open');
+                });
+            })
+            
+
+            const innerCon = document.querySelector('.inner');
+            innerCon.prepend(tabsPanel);
+        }
 
         setTab(newTab) {
             this.activeTab = newTab;
-
+            // elTab.classList.toggle('open');
             this.removeCards();
             this.createCards(this.config[this.activeTab]);
         }
-
 
         removeCards() {
             this.cards.forEach(card => card.removeCard());
@@ -323,7 +336,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     tagEl.classList.add('tag');
                     tagEl.innerHTML = tag.specifications[0].value;
                     containerTag.append(tagEl);
-
                     containerTag.addEventListener('click', () => {
                         tagEl.classList.toggle('open');
                     });
@@ -333,7 +345,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
                 containerTag.addEventListener('click', () => {
                     containerTag.classList.toggle('color-gray');
-
                 });
 
             });
@@ -352,7 +363,6 @@ window.addEventListener('DOMContentLoaded', () => {
             });
 
             specificationsCard.append(elementArrContainerCard)
-            // titleCard.append(title)
             this.containerCard.append(titleCard)
             this.containerCard.append(specificationsCard)
             this.containerCard.append(tagsButton)
