@@ -7,51 +7,14 @@
     font-family: 'Press Start 2P';
 }
 
-
 .promo {
     width: 100%;
     height: 1080px;
-    /* Пример высоты контейнера */
     background-color: black;
-    /* Цвет фона (серый в данном случае) */
+    // z-index: 1;
 
     .logo {
-        margin: 0 auto;
-        display: block;
-    }
-
-    .container {
-        width: 1200px;
-        /* Ширина контейнера слайдера */
-        margin: 0 auto;
-        /* Центрирование контейнера */
-        overflow: hidden;
-        /* Скрытие выходящих за пределы контейнера элементов */
-        position: relative;
-        /* Позиционирование для кнопок переключения */
-    }
-
-    .controls {
-        position: absolute;
-        /* Позиционирование кнопок */
-        bottom: 10px;
-        /* Отступ от нижней границы */
-        left: 50%;
-        /* Выравнивание по центру горизонтально */
-        transform: translateX(-50%);
-        /* Центрирование относительно родительского элемента */
-
-        .control-button {
-            background-color: #f0f0f0;
-            /* Цвет фона кнопок */
-            border: none;
-            /* Удаление границ */
-            padding: 8px 16px;
-            /* Внутренние отступы */
-            cursor: pointer;
-            /* Изменение курсора при наведении */
-            margin: 0 5px;
-            /* Внешние отступы между кнопками */
-        }
+            margin: 0 auto;
+            display: block;
     }
 }

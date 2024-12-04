@@ -1,36 +1,137 @@
-.cards {
-    display: flex; /* Размещение слайдов в строку */
-    transition: transform 0.5s ease; /* Плавное изменение положения слайдов */
-    gap: 75px;
-    margin-top: 60px;
+.inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    margin: 50px auto;
+    position: relative;
+    flex-direction: column;
 
-    .card {
-        padding: 10px; /* Внутренние отступы для карточек */
-        min-width: 350px;
-        height: 400px;
-        box-sizing: border-box;
-        background-color: #1E1E1E;
-        justify-content: space-between;
-        border-radius: 10px;
+    .panel-tabs {
+        display: flex;
+        color: white;
+        gap: 50px;
 
-        &__title {
-            color: #FDE922;
-            font-size: 18px;
-            text-align: center;
-            /* Выравнивание содержимого по центру */
-            margin-top: 30px;
+        .tab.open {
+            color: #848282;
         }
-            
-        &__body {
-            margin-left: 35px;
-            font-size: 15px;
-            color: white;
-            margin-top: 50px;
-            display: flex;
-            gap: 10px;
-            flex-direction: column
+    }
+
+    .swiper {
+        width: 80%;
+        height: auto;
+        margin-top: 100px;
+
+        .swiper-slide {
+            min-height: 300px;
+            padding: 10px 0px 10px; /* Внутренние отступы для карточек */
+            box-sizing: border-box;
+            background-color: #1E1E1E;
+            border-radius: 10px;  
+
+            .card__title {
+                color: #FDE922;
+                font-size: 18px;
+                text-align: center;
+                margin-top: 30px;
+            }
+
+            .card__specifications {
+                margin-left: 35px;
+                font-size: 13px;
+                color: white;
+                margin-top: 35px;
+                display: flex;
+                gap: 10px;
+                flex-direction: column;
+
+                .elemetArr__title {
+                    background: none;
+                    color: #f0f0f0;
+                    border: none;
+                    cursor: pointer;
+                }
+                
+                .elementArr__container {
+                    display: none;
+
+                    .container__tags {
+                        font-size: 18px;
+                        margin-bottom: 20px;
+                        cursor: pointer;
+
+                        .tag {
+                            display: none;
+                        }
+                        .tag.open {
+                            font-size: 12px;
+                            margin-top: 10px;
+                            margin-left: 10px;
+                            cursor: pointer;
+                            display: flex;
+                            color: #f0f0f0;
+                        }
+                    }
+                    .container__tags.color-gray {
+                        color: #848282;
+                    }
+                }
+                .elementArr__container.open {
+                    margin-top: 20px;
+                    display: flex;
+                    gap: 10px;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+            .card__tags {
+                width: 150px;
+                height: 40px;
+                border-radius: 10px;
+                text-align: center;
+                padding: 13px 5px;
+                font-size: 13px;
+                margin: 0 auto;
+                margin-top: 20px;
+                color: #f0f0f0;
+                cursor: pointer;
+                border: 1px solid #FDE922;
+            }
         }
+    }
+
+    .btn-prev, .btn-next {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 200px;
+        width: 70px;
+        height: 20px;
+        color: white;
+        z-index: 1;
+    }
+
+    .btn-next {
+        right: 50px;
+    }
+
+    .btn-prev {
+        left: 50px;
     }
 }
 
+.swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction {
+    position: absolute;
+    top: 50px;
+    z-index: 0;
+}
 
+.swiper-pagination-bullet {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 14px;
+    background-color: #fff;
+}
